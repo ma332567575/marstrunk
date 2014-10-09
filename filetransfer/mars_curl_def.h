@@ -32,7 +32,7 @@ Call once GMarsCurlGlobalInit and call once GMarsCurlGlobalCleanup.
 /*
 * NAME			GMarsCurlGlobalInit
 
-* PARAMETER	
+* PARAMETER	 
 
 * DESCRIPTION	Call once in the all lifetime of the process. 
 Call once GMarsCurlGlobalInit and call once GMarsCurlGlobalCleanup.
