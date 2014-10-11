@@ -20,9 +20,14 @@ typedef const char*		MLPCSTR;
 typedef char*			MLPSTR;
 typedef void			MVOID;
 typedef unsigned int	MBOOL;
+typedef char			MCHAR;
+typedef unsigned char	MBYTE;
 
 #define MNULL			0
 #define MTRUE			1
 #define MFALSE			0
+
+#define MARS_MAX_PATH		( 256 )
+#define MARS_INVALID_VALUE	( -1 )
 
 #endif

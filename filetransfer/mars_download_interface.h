@@ -14,9 +14,15 @@
 #ifndef _MARS_DOWNLOAD_INTERFACE_H_
 #define _MARS_DOWNLOAD_INTERFACE_H_
 
+// c++ stand library
+#include <memory>
+
+// Third library -- libcurl
+#include "curl.h"
+
+// Our header file
 #include "mars_define.h"
 #include "mars_curl_def.h"
-#include "curl.h"
 
 MINTERFACE CMarsIDownload
 {
@@ -32,11 +38,21 @@ public:
 
 public:
 
-	virtual MBOOL
+	static std::tr1::shared_ptr<CMarsIDownload>
+	CreateDownload( MVOID );
+
+public:
+
+	virtual MFTransCode
 	DoBlockDld
 	(
-		MARS_OUT	MARS_CURL_ERROR_CODE&	enCurlErrorCode,
+		MARS_IN		MLPCSTR					szUrl,
+		MARS_IN		MLPCSTR					szFileName = MNULL,
+		MARS_IN		MBOOL					bVerbase = MTRUE,
+		MARS_IN		MBOOL					bRelocate = MTRUE,
+		MARS_IN		MarsFtransProxyArg*		ProxyArg = MNULL,
 		MARS_IN		MBOOL					bForce = MFALSE
+
 	) = 0;												// 阻塞模式下载
 
 	virtual MVOID DoUnBlockDld( MVOID ) = 0;		// 非阻塞模式下载

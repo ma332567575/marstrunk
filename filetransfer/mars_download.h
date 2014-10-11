@@ -22,20 +22,26 @@ public:
 
 public:
 
-	virtual MVOID Init( MVOID );
-	virtual MVOID Unit( MVOID );
-
 public:
 
-	virtual MBOOL 
+	virtual MFTransCode 
 	DoBlockDld
 	(
-		MARS_OUT	MARS_CURL_ERROR_CODE&	enCurlErrorCode,
+		MARS_IN		MLPCSTR					szUrl,
+		MARS_IN		MLPCSTR					szFileName = MNULL,
+		MARS_IN		MBOOL					bVerbase = MTRUE,
+		MARS_IN		MBOOL					bRelocate = MTRUE,
+		MARS_IN		MarsFtransProxyArg*		ProxyArg = MNULL,
 		MARS_IN		MBOOL					bForce = MFALSE
 	);
 
 	virtual MVOID 
 	DoUnBlockDld( MVOID );
+
+private:
+
+	MVOID Init( MVOID );
+	MVOID Unit( MVOID );
 
 private:
 
@@ -66,7 +72,6 @@ private:
 private:
 
 	// Block download data
-	CURL*			m_BlockHandle;		// For re-use curl
 
 	// Common data
 	MBOOL			m_DldLock;			// Guarantee running by one model

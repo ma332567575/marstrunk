@@ -15,8 +15,6 @@
 #define MARS_CURL_GLOBAL_ALL	CURL_GLOBAL_ALL
 #define MARS_CURL_GLOBAL_SSL	CURL_GLOBAL_SSL
 
-#define MARS_CURL_ERROR_CODE	CURLcode
-
 /*
 * NAME			GMarsCurlGlobalInit
 
@@ -38,6 +36,26 @@ Call once GMarsCurlGlobalInit and call once GMarsCurlGlobalCleanup.
 Call once GMarsCurlGlobalInit and call once GMarsCurlGlobalCleanup.
 */
 #define GMarsCurlGlobalCleanup( )			curl_global_cleanup( );
+
+// FiletransError
+typedef enum
+{
+	MTRNAS_NONE = MARS_INVALID_VALUE,	// first enum
+	MTRANS_OK,							// 
+	MTRANS_INVALID_ARGUMENT,			// Invalid argument
+	MTRANS_EASY_CURL_INITIAL_FAILD,		// Easy curl initialize faild
+	MTRANS_ALREADY_DOWNLOAD,			// Already download
+	MTRANS_CURL_INTERNAL_ERROR,			// Curl error. We can get the detail in log.
+	MTRANS_LAST,						// last enum
+} MFTransCode;
+
+// ProxyData
+typedef struct tagMFTransProxyArg
+{
+	MCHAR	szAddress[MARS_MAX_PATH];
+	MCHAR	szUsername[MARS_MAX_PATH];
+	MCHAR	szPassword[MARS_MAX_PATH];
+} MarsFtransProxyArg;
 
 #endif
 //---------------------------------------------为了Linux，留个空行-----------------------------------------
