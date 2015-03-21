@@ -1,0 +1,12 @@
+/
+-/bin			--application
+--/debug
+---/debug/x64
+---/debug/x86
+--/release
+---/release/x64
+---/release/x86
+./filetransfer		--a project of download and upload module
+./include		--include files
+./lib			--library
+./network		--a project of network module
