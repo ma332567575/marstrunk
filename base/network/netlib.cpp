@@ -1,39 +1,24 @@
 #include "netlib.h"
-#include "BaseSocket.h"
+#include "netlibimp.h"
 
-MBOOL netlib_listen( MLPCSTR szIp, MUI16 uPort, ListenCallback pCallback, MVOID* pCallbackData )
+CNetLibImp* g_clsNetLibImp = new CNetLibImp(  );
+
+MBOOL netlib_listen( MUI16* pPortList, MI32 nPortNum, IServer* pServer )
 {
-    MCServerSocket* pSocket = new MCServerSocket( );
-
-    if ( !pSocket )
-        return MFALSE;
-
-    return pSocket->Listen( szIp, uPort, pCallback, pCallbackData );
+    return g_clsNetLibImp->Listen( pPortList, nPortNum, pServer );
 }
 
-MBOOL netlib_send( net_handle_t Socket, MVOID* pBuf, MI64 nLen )
+MBOOL netlib_send( net_handle_t handleSocket, MVOID* pBuf, MI64 nLen )
 {
-    BaseSocket* pSocket = GetSocketManager->FindSocket( Socket );
-
-    if ( !pSocket )
-        return MFALSE;
-
-    if ( pSocket->GetType( ) != MARS_SOCKET_TYPE_CLIENT )
-        return MFALSE;
-
-    ((MCClientSocket*)pSocket)->Send( pBuf, nLen );
-
-    return MTRUE;
+    return  g_clsNetLibImp->Send( handleSocket, pBuf, nLen );
 }
 
-MBOOL netlib_close( net_handle_t Socket )
+MBOOL netlib_close( net_handle_t handleSocket )
 {
-    BaseSocket* pSocket = FindBaseSocket( Socket );
+    return g_clsNetLibImp->Close( handleSocket );
+}
 
-    if ( !pSocket )
-        return FALSE;
-
-    pSocket->Close( );
-
-    return MTRUE;
+MBOOL netlib_oneloop( MVOID )
+{
+    return g_clsNetLibImp->OneLoop(  );
 }

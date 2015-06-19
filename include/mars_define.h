@@ -10,6 +10,7 @@
 #ifndef _MARS_DEFINE_H_
 #define _MARS_DEFINE_H_
 
+#include <string.h>
 #define MINTERFACE		struct
 #define MARS_IN
 #define MARS_OUT
@@ -24,7 +25,6 @@ typedef unsigned short  MUI16;
 typedef const char*		MLPCSTR;
 typedef char*			MLPSTR;
 
-typedef void			MVOID;
 typedef void*           MPVOID;
 typedef unsigned int	MBOOL;
 
@@ -40,8 +40,22 @@ typedef size_t          MSIZE_T;
 #define MTRUE			(1)
 #define MFALSE			(0)
 #define MCONST          const
+#define MVOID           void
 
 #define MARS_MAX_PATH		(256)
 #define MARS_INVALID_VALUE	(-1)
+
+// nDstSize is unuseful in linux envirment.
+#ifdef _WIN32
+#define MMemcpy( pDst, nDstSize, pSrc, nSrcSize ) memcpy_s( pDst, nDstSize, pSrc, nSrcSize )
+#else
+#define MMemcpy( pDst, nDstSize, pSrc, nSrcSize ) memcpy( pDst, pSrc, nSrcSize )
+#endif
+
+#ifdef _WIN32
+#define MStrcmp( pDst, pSrc ) todoMStrcmp( pDst, pSrc )
+#else
+#define MStrcmp( pDst, pSrc ) strcmp( pDst, pSrc )
+#endif
 
 #endif

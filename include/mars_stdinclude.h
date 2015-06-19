@@ -21,6 +21,7 @@
 #include <string>
 #include <queue>
 #include <fstream>
+#include <algorithm>
 
 using std::map;
 using std::list;

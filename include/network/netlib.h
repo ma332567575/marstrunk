@@ -28,10 +28,70 @@
 
 #include "common.h"
 
-MBOOL netlib_listen( MLPCSTR szIp, MUI16 uPort, ListenCallback pCallback, MVOID* pCallbackData );
+class IServer
+{
+public:
+  IServer( MVOID );
+  virtual ~IServer( MVOID );
 
-MBOOL netlib_send( net_handle_t Socket, MVOID* pBuf, MI64 nLen );
+public:
+  // A client connected event
+  // @Result    true 
+  //            false   Consider the client is error
+  virtual MBOOL OnListen( MUI16 uServerPort, MLPCSTR szClientIp, MUI16 uClientPort, net_handle_t handleClient ) = 0;
+  // A client data can be received
+  virtual MVOID OnReceive( net_handle_t handleClient, MPVOID szBuff, MI32 nBuffLen ) = 0;
+  // A client close
+  virtual void OnClose( net_handle_t handleClient ) = 0;
 
-MBOOL netlib_close( net_handle_t Socket );
+};
+
+/********************************************
+ * Function
+ * Description: You cant call this function repeatly once calling the function successfully.
+ * 
+ * @Param pPortList: port list, the ports you want listen.
+ * @Param pServer: Event pump
+ * @Result: MTRUE  Suc
+ *          MFALSE Failed
+ *
+ ********************************************/
+MBOOL netlib_listen( MUI16* pPortList, MI32 nPortNum, IServer* pServer );
+
+/********************************************
+ * Function
+ * Description: Send data to a socket 
+ * 
+ * @Param Socket: Object socket
+ * @Param pBuf: the data you want send
+ * @Param nLen: the size of data you want send
+ * @Result: MTRUE  Suc
+ *          MFALSE Failed
+ *
+ ********************************************/
+MBOOL netlib_send( net_handle_t handleSocket, MPVOID pBuf, MI32 nLen );
+
+/********************************************
+ * Function
+ * Description: Close a socket 
+ * 
+ * @Param Socket: Object socket
+ * @Param pBuf: the data you want send
+ * @Param nLen: the size of data you want send
+ * @Result: MTRUE  Suc
+ *          MFALSE Failed
+ *
+ ********************************************/
+MBOOL netlib_close( net_handle_t handleSocket );
+
+/********************************************
+ * Function
+ * Description: It's neccesary. Perform the network module. It will deal the network io.If there are msg, the callback that user set will be triggered.
+ * 
+ * @Result: MTRUE  Suc
+ *          MFALSE Failed
+ *
+ ********************************************/
+MBOOL netlib_oneloop( MVOID );
 
 #endif // netlib_h__
