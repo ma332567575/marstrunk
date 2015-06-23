@@ -34,6 +34,8 @@ typedef unsigned char*  MPBYTE;
 
 #ifdef _WIN32
 typedef size_t          MSIZE_T;
+#else
+typedef size_t          MSIZE_T;
 #endif
 
 #define MNULL			(0)
@@ -56,6 +58,18 @@ typedef size_t          MSIZE_T;
 #define MStrcmp( pDst, pSrc ) todoMStrcmp( pDst, pSrc )
 #else
 #define MStrcmp( pDst, pSrc ) strcmp( pDst, pSrc )
+#endif
+
+#ifdef _WIN32
+#define MMemmove( pDst, nDstSize, pSrc, nMoveSize ) memmove_s( (pDst), (nDstSize), (pSrc), (nMoveSize) )
+#else
+#define MMemmove( pDst, nDstSize, pSrc, nMoveSize ) memmove( (pDst), (pSrc), nMoveSize )
+#endif
+
+#ifdef _WIN32
+#define MZeroMemory( pBuff, nBufferSize ) memset( (pBuff), 0, nBufferSize )
+#else
+#define MZeroMemory( pBuff, nBufferSize ) memset( (pBuff), 0, nBufferSize )
 #endif
 
 #endif

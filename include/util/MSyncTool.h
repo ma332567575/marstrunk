@@ -15,6 +15,9 @@
 
 #include "mars_stdinclude.h"
 
+#ifndef _WIN32
+#include <pthread.h>
+#endif
 namespace Mars
 {
     //----------------------------------------------------------
@@ -25,6 +28,8 @@ namespace Mars
     typedef PCRITICAL_SECTION MARS_PCRITICAL_SECTION;
 
 #else
+    typedef pthread_mutex_t     MARS_CRITICAL_SECTION;
+    typedef pthread_mutex_t*    MARS_PCRITICAL_SECTION;
 #endif
     
     MVOID MarsInitCriticalSection( MARS_PCRITICAL_SECTION pCSection );

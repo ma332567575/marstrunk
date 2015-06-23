@@ -65,7 +65,7 @@ MI64 MCSimpleBuffer::Write( MPVOID pBuf, MI64 nSize )
 MI64 MCSimpleBuffer::Read( MPVOID pBuf, MI64 nSize )
 {
     // 1. 函数运行条件检查
-    if ( !pBuf || nSize <= 0 )
+    if ( nSize <= 0 )
     {
         return 0;
     }
@@ -77,7 +77,10 @@ MI64 MCSimpleBuffer::Read( MPVOID pBuf, MI64 nSize )
     }
 
     // 3. 拷贝过去
-    MMemcpy( pBuf, nSize, m_Buffer, nSize );
+    if ( pBuf )
+    {
+        MMemcpy( pBuf, nSize, m_Buffer, nSize );
+    }
 
     // 4. 移动自身
     // TODO: 考虑用环形BUFFER

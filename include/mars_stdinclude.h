@@ -35,16 +35,4 @@ using std::make_pair;
 #include <Windows.h>
 #endif
 
-#ifdef _WIN32
-#define MMemcpy( pDst, nDstSize, pSrc, nCpySize )   memcpy_s( (pDst), (nDstSize), (pSrc), (nCpySize) )
-#endif
-
-#ifdef _WIN32
-#define MMemmove( pDst, nDstSize, pSrc, nMoveSize ) memmove_s( (pDst), (nDstSize), (pSrc), (nMoveSize) )
-#endif
-
-#ifdef _WIN32
-#define MZeroMemory( pBuff, nBufferSize ) memset( (pBuff), 0, nBufferSize )
-#endif
-
 #endif // mars_stdinclude_h__

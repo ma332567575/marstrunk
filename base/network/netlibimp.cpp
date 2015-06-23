@@ -162,13 +162,145 @@ MBOOL CServerSocketHandler::OnListen( MVOID )
     return MTRUE;
 }
 
+CClientSocketHandler::CClientSocketHandler( MLPCSTR szIp, MUI16 uPort )
+{
+    MMemcpy( m_ClientIp, MARS_NET_IP_STR_LENGTH, szIp, MARS_NET_IP_STR_LENGTH );
+    m_ClientPort = uPort;
+    m_Busy = MFALSE;
+}
+
+CClientSocketHandler::~CClientSocketHandler( MVOID )
+{
+
+}
+
+MBOOL CClientSocketHandler::OnRecv( MVOID )
+{
+    // Fixed data
+    // 10 KB
+    static MBYTE szBuff[10240];
+    memset( szBuff, 0, 10240 );
+
+    MI32 nLen = ::recv( m_Socket, szBuff, 10240, 0 );
+
+    if ( nLen > 0 )
+    {
+        g_clsNetLibImp->m_ServerPump->OnReceive( m_Socket, szBuff, nLen );
+    }
+    else if ( nLen == 0 )//Close
+    {
+        g_clsNetLibImp->m_ServerPump->OnClose( m_Socket );
+    }
+    else // Error
+    {
+        g_clsNetLibImp->m_ServerPump->OnClose( m_Socket );
+    }
+
+    return MTRUE;    
+}
+
+MBOOL CClientSocketHandler::OnSend( MVOID )
+{
+    if ( !m_Busy )
+    {
+        return MTRUE;
+    }
+
+    while( m_SendBuffer.GetWriteSize(  ) > 0 )
+    {
+        MI32 nSendSize = m_SendBuffer.GetWriteSize(  );
+        if ( nSendSize > 64 * 1024 )
+        {
+            nSendSize = 64 * 1024;
+        }    
+
+        MI32 nRet = send( m_Socket, (MPBYTE)( m_SendBuffer.GetBuffer(  ) ), nSendSize, 0 );
+
+        if ( nRet == 0 )
+        {
+            break;
+        }
+
+        // Block
+        if ( nRet < 0 )
+        {
+            if ( errno == EINPROGRESS || errno == EAGAIN )
+            {
+                
+            }
+            break;
+        }
+
+        m_SendBuffer.Read( MNULL, nRet );
+    }
+
+    if ( m_SendBuffer.GetWriteSize(  ) == 0 )
+    {
+        m_Busy = MFALSE;
+    }
+
+    return MTRUE;
+}
+
+MBOOL CClientSocketHandler::Send( MPVOID pBuff, MI32 nLen )
+{
+    // 1. Socket is busy, write buff to cache
+    if ( m_Busy )
+    {
+        m_SendBuffer.Write( pBuff, nLen );
+        return MTRUE;
+    }
+
+    MI32 nOffset = 0;
+    MI32 nRemain = nLen;
+
+    while ( nRemain > 0 )
+    {
+        MI32 nSendSize = nRemain;
+        // TODO: Replace max buf size with macro
+        if ( nSendSize > 64 * 1024 )
+        {
+            nSendSize = 64 * 1024;
+        }
+
+        MI32 nRet = send( m_Socket, (MPBYTE)(pBuff + nOffset), nSendSize, 0 );
+
+        if ( nRet == 0 )
+        {
+            break;
+        }
+
+        // block
+        if ( nRet < 0 )
+        {
+            // TODO: Error is block then cache
+            if ( errno == EINPROGRESS || errno == EAGAIN )
+            {
+                
+            }
+            break;
+        }
+
+        nOffset += nRet;
+        nRemain -= nRet;
+        
+    }
+
+    // Cache remain data
+    if ( nRemain > 0 )
+    {
+        m_SendBuffer.Write( (MPBYTE)( pBuff + nOffset ), nRemain );
+        m_Busy = MTRUE;
+    }
+    return MTRUE;
+}
+
 CNetLibImp::CNetLibImp( ):m_ServerPump(MNULL), m_EpollFd( MARS_INVALID_VALUE )
 {
     
 }
 
-CNetLibImp::~CNetLibImp( )
-{
+CNetLibImp::~CNetLibImp( ) {
 
 }
 
@@ -251,7 +383,24 @@ MBOOL CNetLibImp::Listen( MUI16* pPortList, MI32 nPortNum, IServer* pServer )
 
 MBOOL CNetLibImp::Send( net_handle_t handleSocket, MPVOID pBuf, MI32 nLen )
 {
-    return MTRUE;
+    // 1. Find the socket handler
+    SocketHandlerMapIter Iter = m_SocketHandlerSet.find( handleSocket ); 
+
+    if ( Iter == m_SocketHandlerSet.end(  ) )
+    {
+        return MFALSE;
+    }
+
+    // Check socket handler type
+    if ( Iter->second->GetSocketType(  ) != Mars_Socket_Handler_Type_Client )
+    {
+        return MFALSE;
+    }
+
+    // 2. Call socket handler send method
+    // force transfer
+    CClientSocketHandler* pHandler = reinterpret_cast<CClientSocketHandler*> (Iter->second);
+    return pHandler->Send( pBuf, nLen );
 }
 
 MBOOL CNetLibImp::Close( net_handle_t handleSocket )

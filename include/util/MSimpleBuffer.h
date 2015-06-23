@@ -24,7 +24,7 @@ namespace Mars
         ~MCSimpleBuffer( MVOID );
 
     public:
-        MI64 GetWrietSize( MVOID )
+        MI64 GetWriteSize( MVOID )
         { return m_WriteSize; }
 
         MI64 GetAllocSize( MVOID )

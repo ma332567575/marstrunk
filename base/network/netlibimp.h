@@ -16,6 +16,9 @@
 #include "common.h"
 #include "mars_stdinclude.h"
 #include <sys/epoll.h>
+#include "MSimpleBuffer.h"
+
+using namespace Mars;
 
 enum MarsSocketHandlerType
 {
@@ -76,10 +79,14 @@ public:
 public:
     MBOOL OnRecv( MVOID );
     MBOOL OnSend( MVOID );
+    MBOOL Send( MPVOID pBuff, MI32 nLen );
 
 private:
-    MCHAR m_ClientIp[MARS_NET_IP_STR_LENGTH];
-    MUI16 m_ClientPort;
+    MCHAR           m_ClientIp[MARS_NET_IP_STR_LENGTH];
+    MUI16           m_ClientPort;
+
+    MCSimpleBuffer  m_SendBuffer;
+    MBOOL           m_Busy;
 
 };
 
